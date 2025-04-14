@@ -1,0 +1,2 @@
+- [Cloud Computing](https://practicum.yandex.ru/profile/yc-cross-cloud) [cloud-computing](cloud-computing)
+- [IaC: Терраформ](https://practicum.yandex.ru/profile/yc-devops-terraform/) [terraform](terraform)
