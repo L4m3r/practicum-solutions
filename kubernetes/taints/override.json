@@ -1,0 +1,25 @@
+{
+  "spec": {
+    "containers": [
+      {
+        "name": "check-exchange-rates",
+        "image": "alpine/curl",
+        "command": ["sh", "-c", "cat /data/exchange-rates.xml"],
+        "volumeMounts": [
+          {
+            "name": "data-volume",
+            "mountPath": "/data"
+          }
+        ]
+      }
+    ],
+    "volumes": [
+      {
+        "name": "data-volume",
+        "persistentVolumeClaim": {
+          "claimName": "exchange-rates-pvc"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: load-generator-script
+  namespace: default
+data:
+  load_generator.py: |
+    import time
+    import random
+    import multiprocessing
+    import logging
+
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
+
+    def cpu_load(duration):
+        end_time = time.time() + duration
+        while time.time() < end_time:
+            pass
+
+    def memory_load(duration, size):
+        memory_hog = []
+        end_time = time.time() + duration
+        while time.time() < end_time:
+            memory_hog.append(' ' * size)
+            time.sleep(1)
+        memory_hog.clear()
+
+    if __name__ == "__main__":
+        while True:
+            load_type = random.choice(['cpu', 'memory'])
+            duration = random.randint(5, 20)
+            if load_type == 'cpu':
+                logging.info(f"Generating CPU load for {duration} seconds.")
+                cpu_load(duration)
+            elif load_type == 'memory':
+                size = random.randint(10**7, 10**8)  # 10MB to 100MB
+                logging.info(f"Generating memory load ({size} bytes) for {duration} seconds.")
+                memory_load(duration, size)
+            time.sleep(random.randint(5, 15))
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: load-generator
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: load-generator
+  template:
+    metadata:
+      labels:
+        app: load-generator
+    spec:
+      containers:
+        - name: load-generator
+          image: python:3.8
+          command: ["python", "/scripts/load_generator.py"]
+          volumeMounts:
+            - name: script-volume
+              mountPath: /scripts
+      volumes:
+        - name: script-volume
+          configMap:
+            name: load-generator-script

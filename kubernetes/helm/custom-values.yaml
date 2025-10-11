@@ -1,0 +1,8 @@
+## @param replicaCount Number of NGINX replicas to deploy
+##
+replicaCount: 2
+
+## @param staticSiteConfigmap Name of existing ConfigMap with the server static site content
+##
+staticSiteConfigmap: "index"
+

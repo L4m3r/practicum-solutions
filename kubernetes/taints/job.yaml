@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: exchange-rates-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: get-cbr-exchange-rates
+spec:
+  template:
+    spec:
+      containers:
+        - name: curl
+          image: alpine/curl
+          command: ["sh", "-c"]
+          args:
+            - curl -s -k http://www.cbr.ru/scripts/XML_daily_eng.asp > /data/exchange-rates.xml
+          volumeMounts:
+            - name: data-volume
+              mountPath: /data
+      volumes:
+        - name: data-volume
+          persistentVolumeClaim:
+            claimName: exchange-rates-pvc
+      restartPolicy: Never
